@@ -63,7 +63,7 @@ uint8_t tournament_globalPre;
 //perceptron
 int p_ghistoryBits = 9; // Number of bits used for Global History
 int tableSize = 28; //table size
-int theta = 1.93 * p_ghistoryBits + 14; // Threshold of perceptron
+int theta = 1.93 * 9 + 14; // Threshold of perceptron
 uint32_t p_mask;
 uint32_t p_globalReg;   //global pattern
 
@@ -192,18 +192,18 @@ uint8_t perceptron_prediction(uint32_t pc)
 {
     id = pc % tableSize;
     int *allW = perceptronTable[id];
-    p_score = weights[0];
+    p_score = allW[0];
     uint32_t history = p_globalReg;
     
     int b, i=0;
     while(i < p_ghistoryBits){
         b = history % 2;
         history /= 2;
-        p_score = ((bit == 0) ? (p_score - allW[i + 1]) : (p_score + allW[i + 1]));
+        p_score = ((b == 0) ? (p_score - allW[i + 1]) : (p_score + allW[i + 1]));
         ++i;
     }
     
-    return ((p_score < 0)? NOTTAKEN:TAKEN)
+    return ((p_score < 0)? NOTTAKEN:TAKEN);
 
 }
 
@@ -227,7 +227,7 @@ make_prediction(uint32_t pc)
     case TOURNAMENT:
       return tournament_prediction(pc);
     case CUSTOM: {
-      p_prediction = perceptron_prediction(pc)
+      p_prediction = perceptron_prediction(pc);
       return p_prediction;
     }
     default:
