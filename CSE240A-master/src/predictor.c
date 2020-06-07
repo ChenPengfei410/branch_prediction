@@ -9,6 +9,7 @@
 #include <string.h>
 #include "predictor.h"
 
+#define abs(a) ((a) < 0 ? -(a) : (a))
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define max(a, b) ((a) > (b) ? (a) : (b))
 #define convert(c) (c == SN || c == WN) ? NOTTAKEN : TAKEN;
@@ -16,9 +17,9 @@
 //
 // TODO:Student Information
 //
-const char *studentName = "Pengfei Chen";
-const char *studentID   = "A53309067";
-const char *email       = "jackchan0410gmail.com";
+const char *studentName = "Kaichen Tang";
+const char *studentID   = "A53303810";
+const char *email       = "k4tang@eng.ucsd.edu";
 
 
 //------------------------------------//
@@ -70,6 +71,7 @@ uint8_t *p_PHT;
 int **perceptronTable; //pointer to tables
 uint8_t *p_choicePT;
 int p_score, id;
+uint8_t p_prediction;
 
 
 
@@ -107,9 +109,7 @@ void init_tournament() {
 
 void init_perceptron()
 {
-    p_globalReg =0;
-    p_mask = ((1 << p_ghistoryBits) - 1);
-    
+    p_mask = (1 << p_ghistoryBits) - 1;
     
     int p_choicePT_size = (1 << p_ghistoryBits) * sizeof(uint8_t);
     p_choicePT = malloc(p_choicePT_size);
@@ -122,8 +122,8 @@ void init_perceptron()
     int perceptronTable_size = tableSize * sizeof(int*);
     perceptronTable = (int **) malloc(perceptronTable_size);
     int i = 0;
-    int tableElemSize = (p_ghistoryBits+1) * sizeof(int);
-    while( i< tableSize)
+    int tableElemSize = (p_ghistoryBits + 1) * sizeof(int);
+    while(i < tableSize)
     {
         perceptronTable[i] = (int *) malloc(tableElemSize);
         memset(perceptronTable[i], 0, tableElemSize);
@@ -195,12 +195,11 @@ uint8_t perceptron_prediction(uint32_t pc)
     p_score = weights[0];
     uint32_t history = p_globalReg;
     
-    int b,i=0;
-    while(i <p_ghistoryBits){
-        b = history % (1<<1) ;
+    int b, i=0;
+    while(i < p_ghistoryBits){
+        b = history % 2;
         history /= 2;
-        p_score = ((bit == 0)?   (p_score - allW[i+1]):(p_score + allW[i+1])   )
-        
+        p_score = ((bit == 0) ? (p_score - allW[i + 1]) : (p_score + allW[i + 1]));
         ++i;
     }
     
@@ -227,8 +226,10 @@ make_prediction(uint32_t pc)
       return gshare_predict(pc);
     case TOURNAMENT:
       return tournament_prediction(pc);
-    case CUSTOM:
-      return perceptron_prediction(pc);
+    case CUSTOM: {
+      p_prediction = perceptron_prediction(pc)
+      return p_prediction;
+    }
     default:
       break;
   }
@@ -283,6 +284,23 @@ tournament_train(uint32_t pc, uint8_t outcome) {
     
     localPHT[localPHTIndex] |= outcome;
     globalhistory |= outcome;
+}
+
+void
+perceptron_train(uint32_t pc, uint8_t outcome) {
+  if (p_prediction != outcome || abs(p_prediction) < theta) {
+    int *allW = perceptronTable[id];
+    allW[0] += (outcome == TAKEN) ? 1 : -1;
+
+    uint32_t history = p_globalReg;
+    for (int i = 1; i <= p_ghistoryBits; ++i) {
+      allW[i] += ((history % 2) == outcome) ? 1 : -1;
+      history /= 2;
+    }
+  }
+
+  p_globalReg <<= 1;
+  p_globalReg += outcome;
 }
 
 // Train the predictor the last executed branch at PC 'pc' and with
