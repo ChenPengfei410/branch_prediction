@@ -62,7 +62,7 @@ uint8_t tournament_globalPre;
 
 //perceptron
 int p_ghistoryBits = 9; // Number of bits used for Global History
-int tableSize = 28; //table size
+int tableSize = 120; //table size
 int theta = 1.93 * 9 + 14; // Threshold of perceptron
 uint32_t p_mask;
 uint32_t p_globalReg;   //global pattern
@@ -288,13 +288,14 @@ tournament_train(uint32_t pc, uint8_t outcome) {
 
 void
 perceptron_train(uint32_t pc, uint8_t outcome) {
+    int range = 1;
   if (p_prediction != outcome || abs(p_prediction) < theta) {
     int *allW = perceptronTable[id];
-    allW[0] += (outcome == TAKEN) ? 1 : -1;
+    allW[0] += (outcome == TAKEN) ? range : -range;
 
     uint32_t history = p_globalReg;
     for (int i = 1; i <= p_ghistoryBits; ++i) {
-      allW[i] += ((history % 2) == outcome) ? 1 : -1;
+      allW[i] += ((history % 2) == outcome) ? range : -range;
       history /= 2;
     }
   }
