@@ -44,6 +44,9 @@ int verbose;
 //TODO: Add your own Branch Predictor data structures here
 //
 
+int N;
+int trained[20] = {0, 6, 0, 2, 3, 3, 0, 1, -1, 0, 0, 1, 1, 0, 0, 0, 0, 0, -1, 0};
+
 uint32_t globalhistory;
 
 uint8_t *gshare_BHT;
@@ -61,9 +64,9 @@ uint8_t tournament_localPre;
 uint8_t tournament_globalPre;
 
 //perceptron
-int p_ghistoryBits = 9; // Number of bits used for Global History
-int tableSize = 120; //table size
-int theta = 1.93 * 9 + 14; // Threshold of perceptron
+int p_ghistoryBits = 29; // Number of bits used for Global History
+int tableSize = 66; //table size
+int theta = 1.93 * 29 + 14; // Threshold of perceptron
 uint32_t p_mask;
 uint32_t p_globalReg;   //global pattern
 
@@ -127,6 +130,8 @@ void init_perceptron()
     {
         perceptronTable[i] = (int *) malloc(tableElemSize);
         memset(perceptronTable[i], 0, tableElemSize);
+        //for (int j = 0; j < 20; ++j)
+        //  perceptronTable[i][j] = trained[j];
         perceptronTable[i][0] = 1;
         i++;
     }
@@ -288,14 +293,13 @@ tournament_train(uint32_t pc, uint8_t outcome) {
 
 void
 perceptron_train(uint32_t pc, uint8_t outcome) {
-    int range = 1;
-  if (p_prediction != outcome || abs(p_prediction) < theta) {
+  if (p_prediction != outcome || abs(p_score) < theta) {
     int *allW = perceptronTable[id];
-    allW[0] += (outcome == TAKEN) ? range : -range;
+    allW[0] += (outcome == TAKEN) ? 1 : -1;
 
     uint32_t history = p_globalReg;
     for (int i = 1; i <= p_ghistoryBits; ++i) {
-      allW[i] += ((history % 2) == outcome) ? range : -range;
+      allW[i] += ((history % 2) == outcome) ? 1 : -1;
       history /= 2;
     }
   }
@@ -314,6 +318,22 @@ train_predictor(uint32_t pc, uint8_t outcome)
   //
   //TODO: Implement Predictor training
   //
+  if (++N % 100000 == 0) {
+    printf("%d\n", N);
+  }
+  /*
+  if (++N % 100000 == 0) {
+    int weights[20] = {0};
+    for (int i = 0; i < tableSize; ++i) {
+      for (int j = 0; j <= p_ghistoryBits; ++j) {
+        weights[j] += perceptronTable[i][j];
+      }
+    }
+    for (int i = 0; i <= p_ghistoryBits; ++i)
+      printf("%d\t", weights[i] / tableSize);
+    printf("\n");
+  }*/
+  
   switch (bpType) {
     case GSHARE:
       return gshare_train(pc, outcome);
