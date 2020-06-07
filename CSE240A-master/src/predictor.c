@@ -319,6 +319,7 @@ train_predictor(uint32_t pc, uint8_t outcome)
     case TOURNAMENT:
       return tournament_train(pc, outcome);
     case CUSTOM:
+      return perceptron_train(pc, outcome);
     default:
       break;
   }
