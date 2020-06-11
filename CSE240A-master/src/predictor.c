@@ -17,12 +17,12 @@
 //
 // TODO:Student Information
 //
-const char *studentName = "Pengfei Chen";
-const char *studentID   = "A53309067";
-const char *email       = "pec003@eng.ucsd.edu";
-const char *studentName = "Kaichen Tang";
-const char *studentID   = "A53303810";
-const char *email       = "k4tang@eng.ucsd.edu";
+const char *studentName1 = "Pengfei Chen";
+const char *studentID1   = "A53309067";
+const char *email1       = "pec003@eng.ucsd.edu";
+const char *studentName2 = "Kaichen Tang";
+const char *studentID2   = "A53303810";
+const char *email2       = "k4tang@eng.ucsd.edu";
 
 
 //------------------------------------//
@@ -351,19 +351,18 @@ train_predictor(uint32_t pc, uint8_t outcome)
   //
   //TODO: Implement Predictor training
   //
-  ++N;
-
-
-  if (N==10000)
-  {
-    for (int i = 0; i < tableSize; ++i) {
-      for (int j = 0; j <= p_ghistoryBits; ++j) {
-        //weights[j] += perceptronTable[i][j];
-        printf("%d\t",perceptronTable[i][j]);
-      }
-        printf("\n");
-    }
-  }
+    
+//  ++N;
+//  if (N==10000)
+//  {
+//    for (int i = 0; i < tableSize; ++i) {
+//      for (int j = 0; j <= p_ghistoryBits; ++j) {
+//        //weights[j] += perceptronTable[i][j];
+//        printf("%d\t",perceptronTable[i][j]);
+//      }
+//        printf("\n");
+//    }
+//  }
   
   switch (bpType) {
     case GSHARE:
