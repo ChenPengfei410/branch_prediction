@@ -65,8 +65,9 @@ uint8_t tournament_globalPre;
 
 //perceptron
 int p_ghistoryBits = 29; // Number of bits used for Global History
-int tableSize = 66; //table size
+int tableSize = 60; //table size
 int theta = 1.93 * 29 + 14; // Threshold of perceptron
+//int theta = 17;
 uint32_t p_mask;
 uint32_t p_globalReg;   //global pattern
 
@@ -109,6 +110,18 @@ void init_tournament() {
     memset(globalBHT, WN, globalBHT_size);
 }
 
+void init_table(){
+    FILE *fp = NULL;
+    fp = fopen("fp1res.txt","r");
+    for (int i = 0; i < tableSize; ++i) {
+      for (int j = 0; j <= p_ghistoryBits; ++j) {
+
+        fscanf(fp,"%d\t",&perceptronTable[i][j]);
+        printf("%d\t",perceptronTable[i][j]);
+      }
+        fgetc(fp);
+    }
+}
 
 void init_perceptron()
 {
@@ -135,8 +148,11 @@ void init_perceptron()
         perceptronTable[i][0] = 1;
         i++;
     }
+    //init_table();
 
 }
+
+
 
 // Initialize the predictor
 //
@@ -318,21 +334,19 @@ train_predictor(uint32_t pc, uint8_t outcome)
   //
   //TODO: Implement Predictor training
   //
-  if (++N % 100000 == 0) {
-    printf("%d\n", N);
-  }
-  /*
-  if (++N % 100000 == 0) {
-    int weights[20] = {0};
+  ++N;
+
+
+  if (N==16796)
+  {
     for (int i = 0; i < tableSize; ++i) {
       for (int j = 0; j <= p_ghistoryBits; ++j) {
-        weights[j] += perceptronTable[i][j];
+        //weights[j] += perceptronTable[i][j];
+        printf("%d\t",perceptronTable[i][j]);
       }
+        printf("\n");
     }
-    for (int i = 0; i <= p_ghistoryBits; ++i)
-      printf("%d\t", weights[i] / tableSize);
-    printf("\n");
-  }*/
+  }
   
   switch (bpType) {
     case GSHARE:
