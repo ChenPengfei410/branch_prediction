@@ -67,13 +67,14 @@ uint8_t tournament_localPre;
 uint8_t tournament_globalPre;
 
 //perceptron
-//int p_ghistoryBits = 29;
-//int tableSize = 60;
-int p_ghistoryBits = 19;
-int tableSize = 100;
+int p_ghistoryBits = 29;
+int tableSize = 60;
+//int p_ghistoryBits = 19;
+//int tableSize = 100;
 
-int theta = 1.93 * 29 + 14; // Threshold of perceptron
-//int theta = 17;
+
+int theta = 1.93 * 29 + 14;
+
 uint32_t p_mask;
 uint32_t p_globalReg;   //global pattern
 
@@ -318,15 +319,15 @@ perceptron_train(uint32_t pc, uint8_t outcome) {
   if (p_prediction != outcome || abs(p_score) < theta) {
       
     int range=1;
-    if (p_prediction != outcome)
-    {
-        if (abs(p_score) > theta )
-            range=4;
-        else
-            range=3;
-    }
-    else
-        range=2;
+//    if (p_prediction != outcome)
+//    {
+//        if (abs(p_score) > theta )
+//            range=4;
+//        else
+//            range=3;
+//    }
+//    else
+//        range=2;
     
     int *allW = perceptronTable[id];
     allW[0] += (outcome == TAKEN) ? range : -range;
