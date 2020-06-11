@@ -67,10 +67,11 @@ uint8_t tournament_localPre;
 uint8_t tournament_globalPre;
 
 //perceptron
-int p_ghistoryBits = 29;
-int tableSize = 60;
-//int p_ghistoryBits = 19;
-//int tableSize = 100;
+//int p_ghistoryBits = 29;
+//int tableSize = 60;
+int p_ghistoryBits = 19;
+int tableSize = 100;
+
 int theta = 1.93 * 29 + 14; // Threshold of perceptron
 //int theta = 17;
 uint32_t p_mask;
