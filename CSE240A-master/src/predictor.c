@@ -48,7 +48,7 @@ int verbose;
 //
 
 int N;
-int trained[20] = {0, 6, 0, 2, 3, 3, 0, 1, -1, 0, 0, 1, 1, 0, 0, 0, 0, 0, -1, 0};
+int pr_res;
 
 uint32_t globalhistory;
 
@@ -67,22 +67,23 @@ uint8_t tournament_localPre;
 uint8_t tournament_globalPre;
 
 //perceptron
-int p_ghistoryBits = 29;
-int tableSize = 60;
-//int p_ghistoryBits = 19;
-//int tableSize = 100;
+//int p_ghistoryBits = 29;
+//int tableSize = 60;
+int p_ghistoryBits = 19;
+int tableSize = 100;
+int flag = 0;
 
-
-int theta = 1.93 * 29 + 14;
-
+int theta = 1.93 * 29 + 14; // Threshold of perceptron
+//int theta = 17;
 uint32_t p_mask;
 uint32_t p_globalReg;   //global pattern
 
 uint8_t *p_PHT;
 int **perceptronTable; //pointer to tables
-uint8_t *p_choicePT;
 int p_score, id;
 uint8_t p_prediction;
+
+
 
 
 
@@ -134,9 +135,6 @@ void init_perceptron()
 {
     p_mask = (1 << p_ghistoryBits) - 1;
     
-    int p_choicePT_size = (1 << p_ghistoryBits) * sizeof(uint8_t);
-    p_choicePT = malloc(p_choicePT_size);
-    memset(p_choicePT, WN, p_choicePT_size);   // default as w not taken
     
     int p_PHT_size = (1 << p_ghistoryBits) * sizeof(uint8_t);
     p_PHT = malloc(p_PHT_size);
@@ -159,7 +157,14 @@ void init_perceptron()
 
 }
 
+void reinitialize()
+{
+    p_ghistoryBits = 29;
+    tableSize = 60;
+    flag =1;
+    init_perceptron();
 
+}
 
 // Initialize the predictor
 //
@@ -256,6 +261,7 @@ make_prediction(uint32_t pc)
       return tournament_prediction(pc);
     case CUSTOM: {
       p_prediction = perceptron_prediction(pc);
+      pr_res += p_prediction;
       return p_prediction;
     }
     default:
@@ -319,15 +325,17 @@ perceptron_train(uint32_t pc, uint8_t outcome) {
   if (p_prediction != outcome || abs(p_score) < theta) {
       
     int range=1;
-//    if (p_prediction != outcome)
-//    {
-//        if (abs(p_score) > theta )
-//            range=4;
-//        else
-//            range=3;
-//    }
-//    else
-//        range=2;
+    if (flag == 0){
+        if (p_prediction != outcome)
+        {
+            if (abs(p_score) > theta )
+                range=4;
+            else
+                range=3;
+        }
+        else
+            range=2;
+    }
     
     int *allW = perceptronTable[id];
     allW[0] += (outcome == TAKEN) ? range : -range;
@@ -372,7 +380,10 @@ train_predictor(uint32_t pc, uint8_t outcome)
     case TOURNAMENT:
       return tournament_train(pc, outcome);
     case CUSTOM:
-      return perceptron_train(pc, outcome);
+      if (++N == 1000 && pr_res < 550 && pr_res > 450)
+        reinitialize();
+      else
+        return perceptron_train(pc, outcome);
     default:
       break;
   }
