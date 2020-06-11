@@ -310,12 +310,24 @@ tournament_train(uint32_t pc, uint8_t outcome) {
 void
 perceptron_train(uint32_t pc, uint8_t outcome) {
   if (p_prediction != outcome || abs(p_score) < theta) {
+      
+    int range=1;
+    if (p_prediction != outcome)
+    {
+        if (abs(p_score) > theta )
+            range=2;
+        else
+            range=2;
+    }
+    else
+        range=1;
+    
     int *allW = perceptronTable[id];
-    allW[0] += (outcome == TAKEN) ? 1 : -1;
+    allW[0] += (outcome == TAKEN) ? range : -range;
 
     uint32_t history = p_globalReg;
     for (int i = 1; i <= p_ghistoryBits; ++i) {
-      allW[i] += ((history % 2) == outcome) ? 1 : -1;
+      allW[i] += ((history % 2) == outcome) ? range : -range;
       history /= 2;
     }
   }
