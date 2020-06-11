@@ -17,6 +17,9 @@
 //
 // TODO:Student Information
 //
+const char *studentName = "Pengfei Chen";
+const char *studentID   = "A53309067";
+const char *email       = "pec003@eng.ucsd.edu";
 const char *studentName = "Kaichen Tang";
 const char *studentID   = "A53303810";
 const char *email       = "k4tang@eng.ucsd.edu";
@@ -64,8 +67,10 @@ uint8_t tournament_localPre;
 uint8_t tournament_globalPre;
 
 //perceptron
-int p_ghistoryBits = 29; // Number of bits used for Global History
-int tableSize = 60; //table size
+int p_ghistoryBits = 29;
+int tableSize = 60;
+//int p_ghistoryBits = 19;
+//int tableSize = 100;
 int theta = 1.93 * 29 + 14; // Threshold of perceptron
 //int theta = 17;
 uint32_t p_mask;
@@ -110,18 +115,18 @@ void init_tournament() {
     memset(globalBHT, WN, globalBHT_size);
 }
 
-void init_table(){
-    FILE *fp = NULL;
-    fp = fopen("fp1res.txt","r");
-    for (int i = 0; i < tableSize; ++i) {
-      for (int j = 0; j <= p_ghistoryBits; ++j) {
-
-        fscanf(fp,"%d\t",&perceptronTable[i][j]);
-        printf("%d\t",perceptronTable[i][j]);
-      }
-        fgetc(fp);
-    }
-}
+//void init_table(){
+//    FILE *fp = NULL;
+//    fp = fopen("6.txt","r");
+//    for (int i = 0; i < tableSize; ++i) {
+//      for (int j = 0; j <= p_ghistoryBits; ++j) {
+//
+//        fscanf(fp,"%d\t",&perceptronTable[i][j]);
+//        printf("%d\t",perceptronTable[i][j]);
+//      }
+//        fgetc(fp);
+//    }
+//}
 
 void init_perceptron()
 {
@@ -315,12 +320,12 @@ perceptron_train(uint32_t pc, uint8_t outcome) {
     if (p_prediction != outcome)
     {
         if (abs(p_score) > theta )
-            range=2;
+            range=4;
         else
-            range=2;
+            range=3;
     }
     else
-        range=1;
+        range=2;
     
     int *allW = perceptronTable[id];
     allW[0] += (outcome == TAKEN) ? range : -range;
@@ -349,7 +354,7 @@ train_predictor(uint32_t pc, uint8_t outcome)
   ++N;
 
 
-  if (N==16796)
+  if (N==10000)
   {
     for (int i = 0; i < tableSize; ++i) {
       for (int j = 0; j <= p_ghistoryBits; ++j) {
